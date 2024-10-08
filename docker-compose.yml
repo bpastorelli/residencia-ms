@@ -1,7 +1,7 @@
 ---
 version: '3'
 services:      
-  sgc-consumer:
+  residencia_ms:
     image: bpastorelli/residencia_ms
     restart: always
     build: .
