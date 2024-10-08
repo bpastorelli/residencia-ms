@@ -1,0 +1,22 @@
+---
+version: '3'
+services:      
+  sgc-consumer:
+    image: bpastorelli/residencia_ms
+    restart: always
+    build: .
+    ports:
+      - "9091:9081"
+    networks:
+      - app-net
+    environment:
+      - SPRING_KAFKA_HOST=broker
+      - SPRING_KAFKA_REGISTRY=http://schema-registry
+      - DEBIAN_FRONTEND=noninteractive
+      - TZ=America/Sao_Paulo
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+ 
+networks:
+  app-net:       
