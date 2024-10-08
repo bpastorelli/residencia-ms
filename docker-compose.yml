@@ -6,7 +6,7 @@ services:
     restart: always
     build: .
     ports:
-      - "9091:9081"
+      - "9091:8081"
     networks:
       - app-net
     environment:
