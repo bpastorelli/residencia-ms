@@ -1,7 +1,7 @@
 ---
 version: '3'
 services:      
-  residencia_ms:
+  residenciams:
     image: bpastorelli/residencia_ms
     restart: always
     build: .
