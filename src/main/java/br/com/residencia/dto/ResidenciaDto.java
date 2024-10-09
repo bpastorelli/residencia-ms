@@ -1,5 +1,7 @@
 package br.com.residencia.dto;
 
+import java.io.Serializable;
+
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
@@ -10,9 +12,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class ResidenciaDto {
+public class ResidenciaDto implements Serializable {
 	
-	
+	private static final long serialVersionUID = 1323132325L;
+
 	private Long   id;
 	
 	@NotNull(message = "Endereço não pode ser nulo.")
