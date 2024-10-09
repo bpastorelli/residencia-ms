@@ -3,29 +3,32 @@ package br.com.residencia.config;
 import java.util.List;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+@Configuration
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
-	
-	private UserDetailsService appUserDetailsService;
-    
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public WebSecurity(UserDetailsService appUserDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.appUserDetailsService = appUserDetailsService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+            
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Override
@@ -33,9 +36,26 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
         		.mvcMatchers(HttpMethod.POST, "/sgc/token").permitAll()
         		.mvcMatchers(HttpMethod.POST, "/sgc/token/**").permitAll()
+        		.mvcMatchers(HttpMethod.POST, "/sgc/morador/**").permitAll()
+        		.mvcMatchers(HttpMethod.PUT, "/sgc/morador/**").permitAll()
+        		.mvcMatchers(HttpMethod.GET, "/sgc/morador/**").permitAll()
+        		.mvcMatchers(HttpMethod.POST, "/sgc/visita/**").permitAll()
+        		.mvcMatchers(HttpMethod.PUT, "/sgc/visita/**").permitAll()
+        		.mvcMatchers(HttpMethod.GET, "/sgc/visita/**").permitAll()
+        		.mvcMatchers(HttpMethod.POST, "/sgc/visitante/**").permitAll()
+        		.mvcMatchers(HttpMethod.PUT, "/sgc/visitante/**").permitAll()
+        		.mvcMatchers(HttpMethod.GET, "/sgc/visitante/**").permitAll()
+        		.mvcMatchers(HttpMethod.POST, "/sgc/veiculo/**").permitAll()
+        		.mvcMatchers(HttpMethod.PUT, "/sgc/veiculo/**").permitAll()
+        		.mvcMatchers(HttpMethod.GET, "/sgc/veiculo/**").permitAll()
         		.mvcMatchers(HttpMethod.POST, "/sgc/residencia/**").permitAll()
         		.mvcMatchers(HttpMethod.PUT, "/sgc/residencia/**").permitAll()
         		.mvcMatchers(HttpMethod.GET, "/sgc/residencia/**").permitAll()
+        		.mvcMatchers(HttpMethod.GET, "/sgc/access/**").permitAll()
+        		.mvcMatchers(HttpMethod.PUT, "/sgc/access/**").permitAll()
+        		.mvcMatchers(HttpMethod.POST, "/sgc/access/**").permitAll()
+        		.mvcMatchers(HttpMethod.POST, "/sgc/contribuicao/**").permitAll()
+        		.mvcMatchers(HttpMethod.GET, "/sgc/contribuicao/**").permitAll()
         		.antMatchers(HttpMethod.GET, AUTH_WHITELIST).permitAll()
                 .anyRequest()
                 .authenticated()
@@ -82,17 +102,6 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration.applyPermitDefaultValues());
         return source;
-    }
-
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(appUserDetailsService).passwordEncoder(bCryptPasswordEncoder);
-    }
-    
-    @Override
-    @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
     }
   
 }
