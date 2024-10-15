@@ -2,6 +2,7 @@ package br.com.residencia.amqp.producer.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFutureCallback;
@@ -17,7 +18,7 @@ public class ResidenciaProducer extends KafkaTemplateAbstract<ResidenciaDto> {
 	@Value("${residencia.topic.name}")
 	private String topic;
 	
-	public void producer(ResidenciaDto dto) {
+	public void producer(@Payload ResidenciaDto dto) {
 		
 		kafkaTemplate.send(topic, dto).addCallback(
 				success -> log.info("Mensagem publicada: {}", success.getProducerRecord().value()),
@@ -27,7 +28,7 @@ public class ResidenciaProducer extends KafkaTemplateAbstract<ResidenciaDto> {
 	}
 
 	@Async("asyncKafka")
-	public void producerAsync(ResidenciaDto dto) {
+	public void producerAsync(@Payload ResidenciaDto dto) {
 		
 		Runnable runnable = () -> kafkaTemplate.send(topic, dto).addCallback(new ListenableFutureCallback<>() {
 
