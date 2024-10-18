@@ -44,7 +44,7 @@ class ResidenciaController extends RegistroExceptionHandler {
 	private ResidenciaService residenciaService;
 	
 	@ApiOperation(value = "Produz uma mensagem no Kafka para cadastramento de uma nova residência.")
-	@PostMapping(value = "/nova")
+	@PostMapping(value = "/amqp/nova")
 	public ResponseEntity<?> cadastrar(@Valid @RequestBody ResidenciaDto residenciaRequestBody,
 											   BindingResult result ) throws RegistroException{
 		
@@ -72,7 +72,7 @@ class ResidenciaController extends RegistroExceptionHandler {
 	}
 	
 	@ApiOperation(value = "Produz uma mensagem no Kafka para atualização de uma residência.")
-	@PutMapping(value = "/alterar")
+	@PutMapping(value = "/amqp/alterar")
 	public ResponseEntity<?> alterar( 
 			@Valid @RequestBody AtualizaResidenciaDto residenciaRequestBody,
 			@RequestParam(value = "id", defaultValue = "null") Long id,

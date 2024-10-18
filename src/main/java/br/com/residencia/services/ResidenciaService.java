@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Service;
 
 import br.com.residencia.amqp.producer.impl.ResidenciaProducer;
