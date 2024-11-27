@@ -146,7 +146,7 @@ public class ResidenciaService {
 		return new PageImpl<>(response.getData(), pageable, total);
 	}
 	
-	public List<GETResidenciaResponseDto> buscar(List<Long> ids) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+	public List<GETResidenciaResponseDto> buscar(List<String> ids) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		
 		log.info("Buscando residencia(s)...");
 		

@@ -36,8 +36,8 @@ public interface ResidenciaRepository extends JpaRepository<Residencia, Long> {
 	
 	@Query(value = "select *"
 			+ " from residencia r "
-			+ " where (m.id IN :#{#ids} OR :#{#filter.id} IS NULL) "
+			+ " where (r.id IN (:#{#ids})) "
 			, nativeQuery = true)
-	public List<Residencia> findResidenciasById(@Param("ids") List<Long>  ids);
+	public List<Residencia> findResidenciasById(@Param("ids") List<String>  ids);
 
 }

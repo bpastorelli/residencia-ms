@@ -74,8 +74,8 @@ class ResidenciaController extends RegistroExceptionHandler {
 	
 	@ApiOperation(value = "Pesquisa residências a partir dos ids informados.")
 	@GetMapping(value = "/buscar")
-	public ResponseEntity<?> buscarResidenciasFiltro(
-			List<Long> ids) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+	public ResponseEntity<?> buscarResidencias(
+			@RequestParam(value = "ids", defaultValue = "0") List<String> ids) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		
 		List<GETResidenciaResponseDto> residencias = this.residenciaService.buscar(ids);
 		
