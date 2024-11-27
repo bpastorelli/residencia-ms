@@ -1,10 +1,13 @@
 package br.com.residencia.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,5 +33,11 @@ public interface ResidenciaRepository extends JpaRepository<Residencia, Long> {
 	Optional<Residencia> findByCepAndNumeroAndComplemento(String cep, Long numero, String complemento);
 	
 	Optional<Residencia> findByGuide(String guide);
+	
+	@Query(value = "select *"
+			+ " from residencia r "
+			+ " where (m.id IN :#{#ids} OR :#{#filter.id} IS NULL) "
+			, nativeQuery = true)
+	public List<Residencia> findResidenciasById(@Param("ids") List<Long>  ids);
 
 }

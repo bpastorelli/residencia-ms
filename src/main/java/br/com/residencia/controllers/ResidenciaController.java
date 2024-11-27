@@ -1,6 +1,7 @@
 package br.com.residencia.controllers;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -68,6 +69,17 @@ class ResidenciaController extends RegistroExceptionHandler {
 		
 		return filters.isContent() ? new ResponseEntity<>(residencias.getContent(), HttpStatus.OK) :
 					new ResponseEntity<>(residencias, HttpStatus.OK);
+		
+	}
+	
+	@ApiOperation(value = "Pesquisa residências a partir dos ids informados.")
+	@GetMapping(value = "/buscar")
+	public ResponseEntity<?> buscarResidenciasFiltro(
+			List<Long> ids) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+		
+		List<GETResidenciaResponseDto> residencias = this.residenciaService.buscar(ids);
+		
+		return new ResponseEntity<>(residencias, HttpStatus.OK);
 		
 	}
 	

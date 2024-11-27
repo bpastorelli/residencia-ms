@@ -146,6 +146,26 @@ public class ResidenciaService {
 		return new PageImpl<>(response.getData(), pageable, total);
 	}
 	
+	public List<GETResidenciaResponseDto> buscar(List<Long> ids) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+		
+		log.info("Buscando residencia(s)...");
+		
+		List<GETResidenciaResponseDto> listaResidencias = new ArrayList<>();
+		
+		Response<List<GETResidenciaResponseDto>> response = new Response<List<GETResidenciaResponseDto>>();
+		
+		List<Residencia> residencias = this.residenciaRepository.findResidenciasById(ids);
+		
+		for (Residencia residencia : residencias) {			
+			GETResidenciaResponseDto residenciaResponse = residenciaMapper.residenciaToGETResidenciaResponseDto(residencia);
+			listaResidencias.add(residenciaResponse);
+		}
+		
+		response.setData(listaResidencias);
+		
+		return response.getData();
+	}
+	
 	private String gerarGuide() {
 
 		String guide = null;
