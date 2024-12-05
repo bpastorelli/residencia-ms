@@ -1,6 +1,7 @@
 package br.com.residencia.controllers;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -24,11 +25,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.residencia.dto.AtualizaResidenciaDto;
 import br.com.residencia.dto.GETResidenciaResponseDto;
+import br.com.residencia.dto.QueryResidenciaResponseDto;
 import br.com.residencia.dto.ResidenciaDto;
 import br.com.residencia.dto.ResponsePublisherDto;
 import br.com.residencia.errorheadling.RegistroException;
 import br.com.residencia.errorheadling.RegistroExceptionHandler;
 import br.com.residencia.filter.ResidenciaFiltro;
+import br.com.residencia.response.Response;
 import br.com.residencia.services.ResidenciaService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -75,11 +78,13 @@ class ResidenciaController extends RegistroExceptionHandler {
 	@ApiOperation(value = "Pesquisa residências a partir dos ids informados.")
 	@GetMapping(value = "/buscar")
 	public ResponseEntity<?> buscarResidencias(
-			@RequestParam(value = "ids", defaultValue = "0") List<String> ids) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+			@RequestParam(name="ids", required=true) List<String> ids) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		
-		List<GETResidenciaResponseDto> residencias = this.residenciaService.buscar(ids);
+		List<String> idsReplace = this.tratarArray(ids);
 		
-		return new ResponseEntity<>(residencias, HttpStatus.OK);
+		Response<QueryResidenciaResponseDto> residencias = this.residenciaService.buscar(idsReplace);
+		
+		return new ResponseEntity<>(residencias.getData(), HttpStatus.OK);
 		
 	}
 	
@@ -99,6 +104,17 @@ class ResidenciaController extends RegistroExceptionHandler {
 				ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(response.getErrors()) : 
 				ResponseEntity.status(HttpStatus.ACCEPTED).body(response.getTicket());
 		
+	}
+	
+	private List<String> tratarArray(List<String> ids){
+		
+		List<String> idsReplace = new ArrayList<>();
+		
+		for(String id : ids) {
+			idsReplace.add(id.replace("[", "").replace("]", ""));
+		}
+		
+		return idsReplace;
 	}
 
 }

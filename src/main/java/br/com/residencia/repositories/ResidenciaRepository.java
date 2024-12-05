@@ -35,9 +35,9 @@ public interface ResidenciaRepository extends JpaRepository<Residencia, Long> {
 	Optional<Residencia> findByGuide(String guide);
 	
 	@Query(value = "select *"
-			+ " from residencia r "
+			+ " from residencia r"
 			+ " where (r.id IN (:#{#ids})) "
 			, nativeQuery = true)
-	public List<Residencia> findResidenciasById(@Param("ids") List<String>  ids);
+	public List<Residencia> findResidenciasById(@Param("ids") List<String> ids);
 
 }
