@@ -7,8 +7,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import br.com.residencia.dto.GETMoradoresSemResidenciaResponseDto;
 import br.com.residencia.dto.MoradorRequestDto;
-import br.com.residencia.dto.QueryResidenciaResponseDto;
 import br.com.residencia.utils.RestTemplateUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,13 +16,13 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class MoradorSender {
 	
-	@Value("${sgc-backend.morador.url}")
+	@Value("${morador-ms.url}")
 	public String URL;
 	
 	@Autowired
 	private RestTemplate restTemplate;
 	
-	public QueryResidenciaResponseDto buscarMoradores(MoradorRequestDto request) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException{
+	public GETMoradoresSemResidenciaResponseDto buscarMoradores(MoradorRequestDto request) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException{
 		
 		log.info("Consultando moradores no endpoint: {}", URL);
 		
@@ -34,7 +34,7 @@ public class MoradorSender {
 				.params(request)
 				.build();
 		
-		return (QueryResidenciaResponseDto) rest.execute(QueryResidenciaResponseDto.class);
+		return (GETMoradoresSemResidenciaResponseDto) rest.execute(GETMoradoresSemResidenciaResponseDto.class);
 		
 	}
 

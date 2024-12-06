@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import br.com.residencia.amqp.producer.impl.ResidenciaProducer;
 import br.com.residencia.dto.AtualizaResidenciaDto;
 import br.com.residencia.dto.CabecalhoResponsePublisherDto;
+import br.com.residencia.dto.GETMoradoresSemResidenciaResponseDto;
 import br.com.residencia.dto.GETResidenciaResponseDto;
 import br.com.residencia.dto.MoradorRequestDto;
 import br.com.residencia.dto.QueryResidenciaResponseDto;
@@ -24,7 +25,6 @@ import br.com.residencia.errorheadling.RegistroException;
 import br.com.residencia.filter.ResidenciaFiltro;
 import br.com.residencia.mappers.ResidenciaMapper;
 import br.com.residencia.repositories.ResidenciaRepository;
-import br.com.residencia.repositories.query.QueryRepository;
 import br.com.residencia.response.Response;
 import br.com.residencia.senders.MoradorSender;
 import br.com.residencia.validators.Validators;
@@ -36,18 +36,15 @@ public class ResidenciaService {
 
 	@Value("${guide.limit}")
 	private int guideLimit;
-	
+	 
 	@Autowired
-	private QueryRepository<Residencia, ResidenciaFiltro> queryRepository;
+	private ResidenciaRepository residenciaRepository;
 	
 	@Autowired
 	private ResidenciaProducer producer;
 	
 	@Autowired
 	private Validators<ResidenciaDto, AtualizaResidenciaDto> validator;
-	
-	@Autowired
-	private ResidenciaRepository residenciaRepository;
 	
 	@Autowired
 	private ResidenciaMapper residenciaMapper;
@@ -124,9 +121,9 @@ public class ResidenciaService {
 		
 		Response<List<GETResidenciaResponseDto>> response = new Response<List<GETResidenciaResponseDto>>();
 		
-		List<Residencia> residencias = this.queryRepository.query(filtros, pageable);
+		List<Residencia> residencias = this.residenciaRepository.findResidenciaBy(filtros, pageable);
 		
-		long total = this.queryRepository.totalRegistros(filtros);
+		long total = this.residenciaRepository.totalRegistros(filtros);
 		
 		for(Residencia residencia : residencias) {
 			
@@ -135,7 +132,7 @@ public class ResidenciaService {
 			MoradorRequestDto request = MoradorRequestDto.builder()
 					.residenciaId(residencia.getId().toString())
 					.build();
-			QueryResidenciaResponseDto responseMoradores = moradorSender.buscarMoradores(request);
+			GETMoradoresSemResidenciaResponseDto responseMoradores = moradorSender.buscarMoradores(request);
 			
 			residenciaResponse.setMoradores(responseMoradores);
 			listaResidencias.add(residenciaResponse);
