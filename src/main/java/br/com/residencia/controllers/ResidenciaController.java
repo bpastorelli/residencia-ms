@@ -82,7 +82,18 @@ class ResidenciaController extends RegistroExceptionHandler {
 		
 		List<String> idsReplace = this.tratarArray(ids);
 		
-		Response<QueryResidenciaResponseDto> residencias = this.residenciaService.buscar(idsReplace);
+		Response<QueryResidenciaResponseDto> residencias = this.residenciaService.buscarPorIds(idsReplace);
+		
+		return new ResponseEntity<>(residencias.getData(), HttpStatus.OK);
+		
+	}
+	
+	@ApiOperation(value = "Pesquisa residências a partir dos filtros informados. Não paginado.")
+	@GetMapping(value = "/buscar/filtro")
+	public ResponseEntity<?> buscarResidenciasPorFiltros(
+			ResidenciaFiltro filtro) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+		
+		Response<QueryResidenciaResponseDto> residencias = this.residenciaService.buscarPorFiltros(filtro);
 		
 		return new ResponseEntity<>(residencias.getData(), HttpStatus.OK);
 		

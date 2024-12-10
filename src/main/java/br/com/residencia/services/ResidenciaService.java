@@ -143,7 +143,7 @@ public class ResidenciaService {
 		return new PageImpl<>(response.getData(), pageable, total);
 	}
 	
-	public Response<QueryResidenciaResponseDto> buscar(List<String> ids) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+	public Response<QueryResidenciaResponseDto> buscarPorIds(List<String> ids) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		
 		log.info("Buscando residencia(s)...");
 		
@@ -152,6 +152,30 @@ public class ResidenciaService {
 		Response<QueryResidenciaResponseDto> response = new Response<QueryResidenciaResponseDto>();
 		
 		List<Residencia> residencias = this.residenciaRepository.findResidenciasById(ids);
+		
+		for (Residencia residencia : residencias) {			
+			GETResidenciaResponseDto residenciaResponse = residenciaMapper.residenciaToGETResidenciaResponseDto(residencia);
+			listaResidencias.add(residenciaResponse);
+		}
+		
+		QueryResidenciaResponseDto queryResidencia = new QueryResidenciaResponseDto();
+		
+		queryResidencia.setResidencias(listaResidencias);
+		
+		response.setData(queryResidencia);
+		
+		return response;
+	}
+	
+	public Response<QueryResidenciaResponseDto> buscarPorFiltros(ResidenciaFiltro filtros) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+		
+		log.info("Buscando residencia(s)...");
+		
+		List<GETResidenciaResponseDto> listaResidencias = new ArrayList<>();
+		
+		Response<QueryResidenciaResponseDto> response = new Response<QueryResidenciaResponseDto>();
+		
+		List<Residencia> residencias = this.residenciaRepository.findResidenciaBy(filtros);
 		
 		for (Residencia residencia : residencias) {			
 			GETResidenciaResponseDto residenciaResponse = residenciaMapper.residenciaToGETResidenciaResponseDto(residencia);
