@@ -75,7 +75,9 @@ public class ResidenciaService {
 		log.info("Enviando mensagem " +  residenciaRequestBody.toString() + " para o consumer.");
 		
 		this.producer.producerAsync(residenciaRequestBody);
-		this.producerVinculos.producerAsync(residenciaRequestBody);
+		
+		if (residenciaRequestBody.getTicketMorador() != null)
+			this.producerVinculos.producerAsync(residenciaRequestBody);
 		
 		ResponsePublisherDto response = ResponsePublisherDto
 				.builder()
