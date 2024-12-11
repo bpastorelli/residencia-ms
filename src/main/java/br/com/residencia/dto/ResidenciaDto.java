@@ -1,5 +1,7 @@
 package br.com.residencia.dto;
 
+import java.io.Serializable;
+
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
@@ -12,7 +14,9 @@ import lombok.ToString;
 @Data
 @ToString
 @Builder
-public class ResidenciaDto {
+public class ResidenciaDto implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private Long   id;
 	

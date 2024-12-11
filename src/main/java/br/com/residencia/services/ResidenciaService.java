@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import br.com.residencia.amqp.producer.impl.ResidenciaProducer;
+import br.com.residencia.amqp.producer.impl.VinculosProducer;
 import br.com.residencia.dto.AtualizaResidenciaDto;
 import br.com.residencia.dto.CabecalhoResponsePublisherDto;
 import br.com.residencia.dto.GETMoradoresSemResidenciaResponseDto;
@@ -44,6 +45,9 @@ public class ResidenciaService {
 	private ResidenciaProducer producer;
 	
 	@Autowired
+	private VinculosProducer producerVinculos;
+	
+	@Autowired
 	private Validators<ResidenciaDto, AtualizaResidenciaDto> validator;
 	
 	@Autowired
@@ -71,6 +75,7 @@ public class ResidenciaService {
 		log.info("Enviando mensagem " +  residenciaRequestBody.toString() + " para o consumer.");
 		
 		this.producer.producerAsync(residenciaRequestBody);
+		this.producerVinculos.producerAsync(residenciaRequestBody);
 		
 		ResponsePublisherDto response = ResponsePublisherDto
 				.builder()
