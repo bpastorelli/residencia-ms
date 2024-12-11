@@ -24,5 +24,7 @@ public class ResidenciaFiltro {
 	private String guide;
 	
 	private boolean content;
+	
+	private Boolean detalhaMorador;
 
 }

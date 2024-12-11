@@ -117,6 +117,9 @@ public class ResidenciaService {
 		
 		log.info("Buscando residencia(s)...");
 		
+		if (filtros.getDetalhaMorador() == null)
+			filtros.setDetalhaMorador(Boolean.FALSE);
+		
 		List<GETResidenciaResponseDto> listaResidencias = new ArrayList<>();
 		
 		Response<List<GETResidenciaResponseDto>> response = new Response<List<GETResidenciaResponseDto>>();
@@ -126,15 +129,18 @@ public class ResidenciaService {
 		long total = this.residenciaRepository.totalRegistros(filtros);
 		
 		for(Residencia residencia : residencias) {
-			
 			GETResidenciaResponseDto residenciaResponse = residenciaMapper.residenciaToGETResidenciaResponseDto(residencia);
+			if (filtros.getDetalhaMorador().equals(Boolean.TRUE)) {
+				MoradorRequestDto request = MoradorRequestDto.builder()
+						.residenciaId(residencia.getId().toString())
+						.build();
+				GETMoradoresSemResidenciaResponseDto responseMoradores = moradorSender.buscarMoradores(request);
+				
+				residenciaResponse.setMoradores(responseMoradores);
+			} else {
+				residenciaResponse.setMoradores(null);
+			}
 			
-			MoradorRequestDto request = MoradorRequestDto.builder()
-					.residenciaId(residencia.getId().toString())
-					.build();
-			GETMoradoresSemResidenciaResponseDto responseMoradores = moradorSender.buscarMoradores(request);
-			
-			residenciaResponse.setMoradores(responseMoradores);
 			listaResidencias.add(residenciaResponse);
 		}
 		
