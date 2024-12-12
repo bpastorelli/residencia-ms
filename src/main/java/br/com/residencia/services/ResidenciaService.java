@@ -139,9 +139,9 @@ public class ResidenciaService {
 			GETResidenciaResponseDto residenciaResponse = residenciaMapper.residenciaToGETResidenciaResponseDto(residencia);
 			if (filtros.getDetalhaMorador().equals(Boolean.TRUE)) {
 				MoradorRequestDto request = MoradorRequestDto.builder()
-						.residenciaId(residencia.getId().toString())
+						.residenciaId(residencia.getId())
 						.build();
-				GETMoradoresSemResidenciaResponseDto responseMoradores = moradorSender.buscarMoradores(request);
+				GETMoradoresSemResidenciaResponseDto responseMoradores = moradorSender.buscarPorResidenciaId(request);
 				
 				residenciaResponse.setMoradores(responseMoradores);
 			} else {

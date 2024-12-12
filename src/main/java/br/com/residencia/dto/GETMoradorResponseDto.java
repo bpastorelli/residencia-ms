@@ -1,5 +1,8 @@
 package br.com.residencia.dto;
 
+import java.io.Serializable;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import br.com.residencia.enums.PerfilEnum;
@@ -12,8 +15,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GETMoradorResponseDto implements Comparable<GETMoradorResponseDto> {
+public class GETMoradorResponseDto implements Comparable<GETMoradorResponseDto>, Serializable {
 	
+	private static final long serialVersionUID = 1L;
+
 	private Long id;
 	
 	private String nome;
@@ -38,6 +43,9 @@ public class GETMoradorResponseDto implements Comparable<GETMoradorResponseDto> 
 	private Long posicao;
 	
 	private String guide;
+	
+	@JsonUnwrapped
+	private List<GETResidenciaResponseDto> residencias;
 	
 	@Override
 	public int compareTo(GETMoradorResponseDto o) {

@@ -8,24 +8,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import br.com.residencia.dto.AtualizaResidenciaDto;
+import br.com.residencia.dto.GETMoradoresSemResidenciaResponseDto;
+import br.com.residencia.dto.GETVinculoMoradorResidenciaResponseDto;
+import br.com.residencia.dto.MoradorRequestDto;
 import br.com.residencia.dto.ResidenciaDto;
+import br.com.residencia.dto.VinculoResidenciaRequestDto;
 import br.com.residencia.entities.Residencia;
 import br.com.residencia.errorheadling.ErroRegistro;
 import br.com.residencia.errorheadling.RegistroException;
 import br.com.residencia.repositories.ResidenciaRepository;
+import br.com.residencia.senders.MoradorSender;
+import br.com.residencia.senders.VinculosSender;
 import br.com.residencia.validators.Validators;
 
 @Component
 public class ValidarCadastroResidencia implements Validators<ResidenciaDto, AtualizaResidenciaDto> {
 	
 	@Autowired
+	private MoradorSender moradorSender;
+	
+	@Autowired
+	private VinculosSender vinculosSender;
+	
+	@Autowired
 	private ResidenciaRepository residenciaRepository;
-	
-	//@Autowired
-	//private MoradorRepository moradorRepository;
-	
-	//@Autowired
-	//private VinculoResidenciaRepository vinculoRepository;
 	
 	private static final String TITULO = "Cadastro de residência recusado!";
 	
@@ -71,24 +77,51 @@ public class ValidarCadastroResidencia implements Validators<ResidenciaDto, Atua
 			if(r.getUf().isBlank() || r.getUf().isEmpty())
 				errors.getErros().add(new ErroRegistro("", TITULO, " Campo UF é obrigatório!"));
 			
-			if(r.getTicketMorador() == null) {
-				this.residenciaRepository.findByCepAndNumeroAndComplemento(r.getCep(), r.getNumero(), r.getComplemento().toUpperCase())
-				.ifPresent(res -> errors.getErros().add(new ErroRegistro("", TITULO, " Endereço já existente")));	
-			}
-
-			/*if(r.getTicketMorador() != null) {			
-				if(!this.moradorRepository.findByGuide(r.getTicketMorador()).isPresent())
-					errors.getErros().add(new ErroRegistro("", TITULO, " Morador a ser vinculado não encontrado"));
-			}*/
-			
 			Optional<Residencia> residencia = this.residenciaRepository.findByCepAndNumeroAndComplemento(r.getCep(), r.getNumero(), r.getComplemento().toUpperCase());
 			
-			/*if(residencia.isPresent() && r.getTicketMorador() != null) {
-				if(this.vinculoRepository.findByResidenciaIdAndMoradorId(residencia.get().getId(), 
-						this.moradorRepository.findByGuide(r.getTicketMorador()).get().getId()).isPresent()) {
+			if(r.getTicketMorador() == null) {
+				if (residencia.isPresent())
+					errors.getErros().add(new ErroRegistro("", TITULO, " Endereço já existente"));	
+			}
+
+			GETVinculoMoradorResidenciaResponseDto vinculos = null;
+			
+			if(r.getTicketMorador() != null) {
+				
+				MoradorRequestDto requestMorador = MoradorRequestDto.builder()
+						.guide(r.getTicketMorador())
+						.build();
+				
+				GETMoradoresSemResidenciaResponseDto moradores = null;
+				
+				try {
+					moradores = moradorSender.buscarPorFiltros(requestMorador);
+				} catch (IllegalArgumentException | IllegalAccessException | ClassNotFoundException e) {
+					e.printStackTrace();
+				}
+
+				if(moradores.getMoradores().size() == 0)
+					errors.getErros().add(new ErroRegistro("", TITULO, " Morador a ser vinculado não encontrado"));
+				else {
+					VinculoResidenciaRequestDto request = VinculoResidenciaRequestDto.builder()
+						.moradorId(moradores.getMoradores().get(0).getId())
+						.residenciaId(residencia.get().getId())
+						.build();
+				
+					try {
+						vinculos = this.vinculosSender.buscarResidenciasPorMorador(request);
+					} catch (IllegalArgumentException | IllegalAccessException | ClassNotFoundException e) {
+						e.printStackTrace();
+					}
+				}
+				
+			}
+			
+			if(residencia.isPresent() && r.getTicketMorador() != null && vinculos != null) {
+				if(vinculos.getMorador().getResidencias().size() > 0) {
 					errors.getErros().add(new ErroRegistro("", TITULO, " O morador informado já está vinculado a esta residência"));
 				}
-			}*/
+			}
 			
 		});
 		

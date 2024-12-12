@@ -78,7 +78,8 @@ public class RestTemplateUtil {
 			try {
 				String fName = f.getName();
 				fValue = f.get(clazz);
-				params.put(fName, fValue.toString());
+				if (fValue != null)
+					params.put(fName, fValue.toString());
 			} catch (IllegalArgumentException e) {
 				e.printStackTrace();
 			} catch (IllegalAccessException e) {
