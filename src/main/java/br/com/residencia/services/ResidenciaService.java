@@ -21,6 +21,7 @@ import br.com.residencia.dto.MoradorRequestDto;
 import br.com.residencia.dto.QueryResidenciaResponseDto;
 import br.com.residencia.dto.ResidenciaDto;
 import br.com.residencia.dto.ResponsePublisherDto;
+import br.com.residencia.dto.VinculoRequestDto;
 import br.com.residencia.entities.Residencia;
 import br.com.residencia.errorheadling.RegistroException;
 import br.com.residencia.filter.ResidenciaFiltro;
@@ -76,8 +77,12 @@ public class ResidenciaService {
 		
 		this.producer.producerAsync(residenciaRequestBody);
 		
-		if (residenciaRequestBody.getTicketMorador() != null)
-			this.producerVinculos.producerAsync(residenciaRequestBody);
+		if (residenciaRequestBody.getTicketMorador() != null) {
+			VinculoRequestDto requestDto = VinculoRequestDto.builder()
+					.ticketMorador(residenciaRequestBody.getTicketMorador())
+					.build();
+			this.producerVinculos.producerAsync(requestDto);	
+		}
 		
 		ResponsePublisherDto response = ResponsePublisherDto
 				.builder()

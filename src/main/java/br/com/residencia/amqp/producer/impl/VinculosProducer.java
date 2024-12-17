@@ -8,17 +8,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import br.com.residencia.amqp.producer.KafkaTemplateAbstract;
-import br.com.residencia.dto.ResidenciaDto;
+import br.com.residencia.dto.VinculoRequestDto;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class VinculosProducer extends KafkaTemplateAbstract<ResidenciaDto> {
+public class VinculosProducer extends KafkaTemplateAbstract<VinculoRequestDto> {
 	
 	@Value("${vinculo.topic.name}")
 	private String topic;
 	
-	public void producer(@Payload ResidenciaDto dto) {
+	public void producer(@Payload VinculoRequestDto dto) {
 		
 		kafkaTemplate.send(topic, dto).addCallback(
 				success -> log.info("Mensagem publicada: {}", success.getProducerRecord().value()),
@@ -28,12 +28,12 @@ public class VinculosProducer extends KafkaTemplateAbstract<ResidenciaDto> {
 	}
 
 	@Async("asyncKafka")
-	public void producerAsync(@Payload ResidenciaDto dto) {
+	public void producerAsync(@Payload VinculoRequestDto dto) {
 		
 		Runnable runnable = () -> kafkaTemplate.send(topic, dto).addCallback(new ListenableFutureCallback<>() {
 
 			@Override
-			public void onSuccess(SendResult<String, ResidenciaDto> result) {
+			public void onSuccess(SendResult<String, VinculoRequestDto> result) {
 				
 				log.info("Mensagem publicada: {}", result.getProducerRecord().value());
 				
