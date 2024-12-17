@@ -28,7 +28,7 @@ public class VinculosSender {
 		log.info("Consultando residencias no endpoint: {}", URL);
 		
 		RestTemplateUtil rest = RestTemplateUtil.builder()
-				.URL(URL)
+				.URL(URL + "/consulta?%s")
 				.mediaType(MediaType.APPLICATION_JSON)
 				.method(HttpMethod.GET)
 				.restTemplate(restTemplate)
@@ -44,7 +44,7 @@ public class VinculosSender {
 		log.info("Consultando moradores no endpoint: {}", URL);
 		
 		RestTemplateUtil rest = RestTemplateUtil.builder()
-				.URL(URL)
+				.URL(URL + "/consulta?%s")
 				.mediaType(MediaType.APPLICATION_JSON)
 				.method(HttpMethod.GET)
 				.restTemplate(restTemplate)
@@ -52,6 +52,22 @@ public class VinculosSender {
 				.build();
 		
 		return (GETVinculoResidenciaMoradorResponseDto) rest.execute(GETVinculoResidenciaMoradorResponseDto.class);
+		
+	}
+	
+	public Boolean existeRelacao(VinculoResidenciaRequestDto request) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException{
+		
+		log.info("Consultando residencias no endpoint: {}", URL);
+		
+		RestTemplateUtil rest = RestTemplateUtil.builder()
+				.URL(URL + "?%s")
+				.mediaType(MediaType.APPLICATION_JSON)
+				.method(HttpMethod.GET)
+				.restTemplate(restTemplate)
+				.params(request)
+				.build();
+		
+		return (Boolean) rest.execute(Boolean.class);
 		
 	}
 

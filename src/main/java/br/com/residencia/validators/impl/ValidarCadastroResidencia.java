@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 
 import br.com.residencia.dto.AtualizaResidenciaDto;
 import br.com.residencia.dto.GETMoradoresSemResidenciaResponseDto;
-import br.com.residencia.dto.GETVinculoMoradorResidenciaResponseDto;
 import br.com.residencia.dto.MoradorRequestDto;
 import br.com.residencia.dto.ResidenciaDto;
 import br.com.residencia.dto.VinculoResidenciaRequestDto;
@@ -77,14 +76,13 @@ public class ValidarCadastroResidencia implements Validators<ResidenciaDto, Atua
 			if(r.getUf().isBlank() || r.getUf().isEmpty())
 				errors.getErros().add(new ErroRegistro("", TITULO, " Campo UF é obrigatório!"));
 			
+			Boolean vinculo = Boolean.FALSE;
 			Optional<Residencia> residencia = this.residenciaRepository.findByCepAndNumeroAndComplemento(r.getCep(), r.getNumero(), r.getComplemento().toUpperCase());
 			
 			if(r.getTicketMorador() == null) {
 				if (residencia.isPresent())
 					errors.getErros().add(new ErroRegistro("", TITULO, " Endereço já existente"));	
 			}
-
-			GETVinculoMoradorResidenciaResponseDto vinculos = null;
 			
 			if(r.getTicketMorador() != null) {
 				
@@ -105,11 +103,11 @@ public class ValidarCadastroResidencia implements Validators<ResidenciaDto, Atua
 				else {
 					VinculoResidenciaRequestDto request = VinculoResidenciaRequestDto.builder()
 						.moradorId(moradores.getMoradores().get(0).getId())
-						.residenciaId(residencia.get().getId())
+						.residenciaId(!residencia.isEmpty() ? residencia.get().getId() : null)
 						.build();
 				
 					try {
-						vinculos = this.vinculosSender.buscarResidenciasPorMorador(request);
+						vinculo = this.vinculosSender.existeRelacao(request);
 					} catch (IllegalArgumentException | IllegalAccessException | ClassNotFoundException e) {
 						e.printStackTrace();
 					}
@@ -117,8 +115,8 @@ public class ValidarCadastroResidencia implements Validators<ResidenciaDto, Atua
 				
 			}
 			
-			if(residencia.isPresent() && r.getTicketMorador() != null && vinculos != null) {
-				if(vinculos.getMorador().getResidencias().size() > 0) {
+			if(residencia.isPresent() && r.getTicketMorador() != null) {
+				if(vinculo.equals(Boolean.TRUE)) {
 					errors.getErros().add(new ErroRegistro("", TITULO, " O morador informado já está vinculado a esta residência"));
 				}
 			}
