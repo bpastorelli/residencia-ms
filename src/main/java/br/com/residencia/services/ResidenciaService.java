@@ -61,7 +61,7 @@ public class ResidenciaService {
 		
 		log.info("Cadastrando um morador: {}", residenciaRequestBody.toString());
 		
-		residenciaRequestBody.setGuide(this.gerarGuide());
+		residenciaRequestBody.setGuide(UUID.randomUUID().toString());
 		
 		this.validator.validarPost(residenciaRequestBody);
 		
@@ -100,7 +100,7 @@ public class ResidenciaService {
 
 		log.info("Atualizando uma residencia: {}", residenciaRequestBody.toString());
 		
-		residenciaRequestBody.setGuide(this.gerarGuide()); 	
+		residenciaRequestBody.setGuide(UUID.randomUUID().toString()); 	
 		
 		this.validator.validarPut(residenciaRequestBody, id);
 		
@@ -207,27 +207,6 @@ public class ResidenciaService {
 		response.setData(queryResidencia);
 		
 		return response;
-	}
-	
-	private String gerarGuide() {
-
-		String guide = null;
-		int i = 0;
-		boolean ticketValido = false;
-		
-		do {
-			i++;
-			if(this.residenciaRepository.findByGuide(guide).isPresent())
-				guide = UUID.randomUUID().toString();
-			else if(guide == null)
-				guide = UUID.randomUUID().toString();
-			else {
-				ticketValido = true;
-			}
-			
-		}while(!ticketValido && i < guideLimit);
-		
-		return guide;
 	}
 	
 	public ResidenciaDto mergeObject(ResidenciaDto t, AtualizaResidenciaDto x) {

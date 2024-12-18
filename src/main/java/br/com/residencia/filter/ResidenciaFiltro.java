@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public class ResidenciaFiltro {
 	
-	private Long id;
+	private String id;
 	
 	private String endereco;
 	
