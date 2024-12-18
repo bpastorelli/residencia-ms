@@ -79,6 +79,9 @@ public class ResidenciaService {
 		
 		if (residenciaRequestBody.getTicketMorador() != null) {
 			VinculoRequestDto requestDto = VinculoRequestDto.builder()
+					.cepResidencia(residenciaRequestBody.getCep())
+					.numeroResidencia(residenciaRequestBody.getNumero())
+					.complementoResidencia(residenciaRequestBody.getComplemento())
 					.ticketMorador(residenciaRequestBody.getTicketMorador())
 					.build();
 			this.producerVinculos.producerAsync(requestDto);	
