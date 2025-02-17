@@ -5,9 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +16,9 @@ import br.com.residencia.dto.AtualizaResidenciaDto;
 import br.com.residencia.dto.CabecalhoResponsePublisherDto;
 import br.com.residencia.dto.GETMoradoresSemResidenciaResponseDto;
 import br.com.residencia.dto.GETResidenciaResponseDto;
+import br.com.residencia.dto.GETResidenciasDto;
 import br.com.residencia.dto.MoradorRequestDto;
+import br.com.residencia.dto.PaginacaoDto;
 import br.com.residencia.dto.QueryResidenciaResponseDto;
 import br.com.residencia.dto.ResidenciaDto;
 import br.com.residencia.dto.ResponsePublisherDto;
@@ -35,9 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class ResidenciaService {
-
-	@Value("${guide.limit}")
-	private int guideLimit;
 	 
 	@Autowired
 	private ResidenciaRepository residenciaRepository;
@@ -128,42 +126,6 @@ public class ResidenciaService {
 		return response;
 	}
 	
-	public Page<GETResidenciaResponseDto> buscar(ResidenciaFiltro filtros, Pageable pageable) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
-		
-		log.info("Buscando residencia(s)...");
-		
-		if (filtros.getDetalhaMorador() == null)
-			filtros.setDetalhaMorador(Boolean.FALSE);
-		
-		List<GETResidenciaResponseDto> listaResidencias = new ArrayList<>();
-		
-		Response<List<GETResidenciaResponseDto>> response = new Response<List<GETResidenciaResponseDto>>();
-		
-		List<Residencia> residencias = this.residenciaRepository.findResidenciaBy(filtros, pageable);
-		
-		long total = this.residenciaRepository.totalRegistros(filtros);
-		
-		for(Residencia residencia : residencias) {
-			GETResidenciaResponseDto residenciaResponse = residenciaMapper.residenciaToGETResidenciaResponseDto(residencia);
-			if (filtros.getDetalhaMorador().equals(Boolean.TRUE)) {
-				MoradorRequestDto request = MoradorRequestDto.builder()
-						.residenciaId(residencia.getId())
-						.build();
-				GETMoradoresSemResidenciaResponseDto responseMoradores = moradorSender.buscarPorResidenciaId(request);
-				
-				residenciaResponse.setMoradores(responseMoradores);
-			} else {
-				residenciaResponse.setMoradores(null);
-			}
-			
-			listaResidencias.add(residenciaResponse);
-		}
-		
-		response.setData(listaResidencias);
-		
-		return new PageImpl<>(response.getData(), pageable, total);
-	}
-	
 	public Response<QueryResidenciaResponseDto> buscarPorIds(List<String> ids) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		
 		log.info("Buscando residencia(s)...");
@@ -188,26 +150,52 @@ public class ResidenciaService {
 		return response;
 	}
 	
-	public Response<QueryResidenciaResponseDto> buscarPorFiltros(ResidenciaFiltro filtros) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+	public Response<GETResidenciasDto> buscarPorFiltros(ResidenciaFiltro filtros, Pageable pageable) throws IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		
 		log.info("Buscando residencia(s)...");
 		
 		List<GETResidenciaResponseDto> listaResidencias = new ArrayList<>();
 		
-		Response<QueryResidenciaResponseDto> response = new Response<QueryResidenciaResponseDto>();
+		if (filtros.getDetalhaMorador() == null)
+			filtros.setDetalhaMorador(Boolean.FALSE);
 		
-		List<Residencia> residencias = this.residenciaRepository.findResidenciaBy(filtros);
+		Response<GETResidenciasDto> response = new Response<GETResidenciasDto>();
+		
+		PageRequest residenciaRequest = PageRequest.of(pageable.getPageNumber() == 0 ? 0 : (pageable.getPageNumber() > 0 ? pageable.getPageNumber() - 1 : 0), pageable.getPageSize());
+		
+		Page<Residencia> residencias = this.residenciaRepository.findResidenciaBy(filtros, residenciaRequest);
 		
 		for (Residencia residencia : residencias) {			
 			GETResidenciaResponseDto residenciaResponse = residenciaMapper.residenciaToGETResidenciaResponseDto(residencia);
+			
+			if (filtros.getDetalhaMorador().equals(Boolean.TRUE)) {
+				MoradorRequestDto request = MoradorRequestDto.builder()
+						.residenciaId(residencia.getId())
+						.build();
+				GETMoradoresSemResidenciaResponseDto responseMoradores = moradorSender.buscarPorResidenciaId(request);
+				
+				residenciaResponse.setMoradores(responseMoradores);
+			}
 			listaResidencias.add(residenciaResponse);
+
 		}
 		
-		QueryResidenciaResponseDto queryResidencia = new QueryResidenciaResponseDto();
+		int page = residencias.getNumber() == 0 ? 1 : (residencias.getNumber() >= 1 ? residencias.getNumber()+1 : 1);
 		
-		queryResidencia.setResidencias(listaResidencias);
+		PaginacaoDto paginacao = PaginacaoDto.builder()
+				.pagina(page)
+				.paginaAnterior(page == 1 ? 1 : page-1)
+				.proximaPagina(page < residencias.getTotalPages() ? page+1 : residencias.getTotalPages())
+				.totalPaginas(residencias.getTotalPages())
+				.totalItems(residencias.getTotalElements())
+				.build();
 		
-		response.setData(queryResidencia);
+		GETResidenciasDto residenciasResponse = GETResidenciasDto.builder()
+				.residencias(listaResidencias)
+				.paginacao(paginacao)
+				.build();
+		
+		response.setData(residenciasResponse);
 		
 		return response;
 	}

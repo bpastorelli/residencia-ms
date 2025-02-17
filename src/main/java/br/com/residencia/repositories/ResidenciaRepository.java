@@ -52,7 +52,7 @@ public interface ResidenciaRepository extends JpaRepository<Residencia, Long> {
 			+ " and (r.uf = :#{#filter.uf} OR :#{#filter.uf} IS NULL) "
 			+ " and (r.guide = :#{#filter.guide} OR :#{#filter.guide} IS NULL) "
 			, nativeQuery = true)
-	public List<Residencia> findResidenciaBy(@Param("filter") ResidenciaFiltro filter, Pageable pageable);
+	public List<Residencia> findResidenciaBy(@Param("filter") ResidenciaFiltro filter);
 	
 	@Query(value = "select *"
 			+ " from residencia r "
@@ -64,8 +64,19 @@ public interface ResidenciaRepository extends JpaRepository<Residencia, Long> {
 			+ " and (r.cidade = :#{#filter.cidade} OR :#{#filter.cidade} IS NULL) "
 			+ " and (r.uf = :#{#filter.uf} OR :#{#filter.uf} IS NULL) "
 			+ " and (r.guide = :#{#filter.guide} OR :#{#filter.guide} IS NULL) "
+			+ " order by r.endereco \n-- #paginacao\n",
+			countQuery = "select count(*)"
+					+ " from residencia r "
+					+ " where (r.id = :#{#filter.id} OR :#{#filter.id} IS NULL) "
+					+ " and (r.endereco like %:#{#filter.endereco}% OR :#{#filter.endereco} IS NULL) "
+					+ " and (r.numero = :#{#filter.numero} OR :#{#filter.numero} IS NULL) "
+					+ " and (r.complemento = :#{#filter.complemento} OR :#{#filter.complemento} IS NULL) "
+					+ " and (r.cep = :#{#filter.cep} OR :#{#filter.cep} IS NULL) "
+					+ " and (r.cidade = :#{#filter.cidade} OR :#{#filter.cidade} IS NULL) "
+					+ " and (r.uf = :#{#filter.uf} OR :#{#filter.uf} IS NULL) "
+					+ " and (r.guide = :#{#filter.guide} OR :#{#filter.guide} IS NULL) "
 			, nativeQuery = true)
-	public List<Residencia> findResidenciaBy(@Param("filter") ResidenciaFiltro filter);
+	public Page<Residencia> findResidenciaBy(@Param("filter") ResidenciaFiltro filter, Pageable pageable);
 	
 	@Query(value = "select count(*)"
 			+ " from residencia r "

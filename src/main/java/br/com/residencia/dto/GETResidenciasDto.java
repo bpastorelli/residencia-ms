@@ -1,5 +1,7 @@
 package br.com.residencia.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,16 +13,10 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaginacaoDto {
-	
-	private int pagina;
-	
-	private int paginaAnterior;
-	
-	private int proximaPagina;
-	
-	private int totalPaginas;
-	
-	private long totalItems;
+public class GETResidenciasDto {
 
+	public List<GETResidenciaResponseDto> residencias;
+	
+	private PaginacaoDto paginacao;
+	
 }

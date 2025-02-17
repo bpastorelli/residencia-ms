@@ -7,7 +7,6 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -24,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.residencia.dto.AtualizaResidenciaDto;
-import br.com.residencia.dto.GETResidenciaResponseDto;
+import br.com.residencia.dto.GETResidenciasDto;
 import br.com.residencia.dto.QueryResidenciaResponseDto;
 import br.com.residencia.dto.ResidenciaDto;
 import br.com.residencia.dto.ResponsePublisherDto;
@@ -68,10 +67,9 @@ class ResidenciaController extends RegistroExceptionHandler {
 			ResidenciaFiltro filters,
 			@PageableDefault(sort = "endereco", direction = Direction.ASC, page = 0, size = 10) Pageable paginacao) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		
-		Page<GETResidenciaResponseDto> residencias = this.residenciaService.buscar(filters, paginacao);
+		Response<GETResidenciasDto>residencias = this.residenciaService.buscarPorFiltros(filters, paginacao);
 		
-		return filters.isContent() ? new ResponseEntity<>(residencias.getContent(), HttpStatus.OK) :
-					new ResponseEntity<>(residencias, HttpStatus.OK);
+		return new ResponseEntity<>(residencias.getData(), HttpStatus.OK);
 		
 	}
 	
@@ -91,9 +89,10 @@ class ResidenciaController extends RegistroExceptionHandler {
 	@ApiOperation(value = "Pesquisa residências a partir dos filtros informados. Não paginado.")
 	@GetMapping(value = "/buscar/filtro")
 	public ResponseEntity<?> buscarResidenciasPorFiltros(
-			ResidenciaFiltro filtro) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
+			ResidenciaFiltro filtro,
+			@PageableDefault(sort = "endereco", direction = Direction.DESC, page = 0, size = 10) Pageable paginacao) throws NoSuchAlgorithmException, IllegalArgumentException, IllegalAccessException, ClassNotFoundException {
 		
-		Response<QueryResidenciaResponseDto> residencias = this.residenciaService.buscarPorFiltros(filtro);
+		Response<GETResidenciasDto> residencias = this.residenciaService.buscarPorFiltros(filtro, paginacao);
 		
 		return new ResponseEntity<>(residencias.getData(), HttpStatus.OK);
 		
