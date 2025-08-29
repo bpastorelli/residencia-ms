@@ -27,6 +27,8 @@ public class RestTemplateUtil {
 
 	private String URL;
 	
+	private String jwtToken;
+	
     private Object params;
     
     private MediaType mediaType;
@@ -39,6 +41,9 @@ public class RestTemplateUtil {
 		
 		HttpHeaders headers = new HttpHeaders();
       	headers.setAccept(Arrays.asList(mediaType));
+        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + jwtToken);
+        headers.set(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE);
+      	
       	HttpEntity<Object> entity = new HttpEntity<>(headers);
       	
       	Map<String, String> paramsMap = null;
