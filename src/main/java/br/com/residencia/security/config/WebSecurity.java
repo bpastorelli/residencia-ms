@@ -31,7 +31,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests(requests -> requests
-                //.mvcMatchers(HttpMethod.GET, "https://j77akndu44.execute-api.sa-east-1.amazonaws.com/prod/**").permitAll()
+                .mvcMatchers(HttpMethod.GET, "https://j77akndu44.execute-api.sa-east-1.amazonaws.com/prod/**").permitAll()
+                .mvcMatchers(HttpMethod.POST, "https://j77akndu44.execute-api.sa-east-1.amazonaws.com/prod/**").permitAll()
+                .mvcMatchers(HttpMethod.PUT, "https://j77akndu44.execute-api.sa-east-1.amazonaws.com/prod/**").permitAll()
                 .mvcMatchers(HttpMethod.GET, "**/sgc/residencia/**").permitAll()
                 .mvcMatchers(HttpMethod.POST, "**/sgc/residencia/**").permitAll()
                 .mvcMatchers(HttpMethod.PUT, "**/sgc/residencia/**").permitAll()
